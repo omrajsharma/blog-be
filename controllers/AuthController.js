@@ -91,4 +91,8 @@ const profile = async (req, res) => {
     }
 }
 
-module.exports = { register, login, profile };
+const logout = async (req, res) => {
+    res.clearCookie('token').status(200).end('Logged out');
+}
+
+module.exports = { register, login, profile, logout };
