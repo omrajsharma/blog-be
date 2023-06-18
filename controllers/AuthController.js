@@ -73,4 +73,22 @@ const login = async (req, res) => {
     res.cookie('token', token, { httpOnly: true }).status(200).end('Logged in');
 }
 
-module.exports = { register, login };
+const profile = async (req, res) => {
+    const { token } = req.cookies;
+
+    if (!token) {
+        res.status(401).end('Not authorized');
+        return;
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findOne({ _id: decoded.id });
+        const { username } = user;
+        res.status(200).json({ username });
+    } catch (error) {
+        res.status(401).end('Not authorized');
+    }
+}
+
+module.exports = { register, login, profile };
