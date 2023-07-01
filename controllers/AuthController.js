@@ -70,7 +70,9 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true }).status(200).end('Logged in');
+    res.cookie('token', token, { httpOnly: true }).status(200).json({
+        username
+    });
 }
 
 const profile = async (req, res) => {
