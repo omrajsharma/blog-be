@@ -1,8 +1,15 @@
 const fs = require('fs');
+const jwt = require('jsonwebtoken')
 const Post = require('../models/Post')
 
 const createPost = async (req, res) => {
     const {title, summary, content} = req.body;
+    const token = req.cookies.token;
+
+    if (!token) {
+        res.status(401).json({ error : 'You must be login'})
+        return;
+    }
 
     if (!title || !summary || !content) {
         res.status(400).end('title, summary and content can not be empty');
@@ -31,14 +38,21 @@ const createPost = async (req, res) => {
     const newPath = path + '.' + fileExtension;
     fs.renameSync(path, newPath);
 
-    const postDoc = await Post.create({
-        title,
-        summary,
-        content,
-        cover: newPath,
-    })
+    try {
+        const tokenInfo = jwt.verify(token, process.env.JWT_SECRET);
 
-    res.json(postDoc)
+        const postDoc = await Post.create({
+            title,
+            summary,
+            content,
+            cover: newPath,
+            author: tokenInfo.id,
+        })
+
+        return res.status(201).json(postDoc)
+    } catch (err) {
+        return res.status(400).json({error : 'Invalid token'})
+    }
 }
 
 module.exports = {createPost}

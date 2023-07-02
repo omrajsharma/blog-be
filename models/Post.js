@@ -16,6 +16,10 @@ const PostSchema = new mongoose.Schema({
     cover: {
         type: String,
         require: [true, 'Banner is required']
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 },
 {
