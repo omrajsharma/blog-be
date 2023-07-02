@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const healthRoute = require('./routes/HealthRoute');
 const authRoutes = require('./routes/AuthRoutes');
+const postRoutes = require('./routes/PostRoutes');
 
 const app = express();
 app.use(express.json());
@@ -32,6 +33,7 @@ db.on('error', (error) => console.error(error));
  */
 app.use('/health', healthRoute);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/post', postRoutes)
 
 
 
