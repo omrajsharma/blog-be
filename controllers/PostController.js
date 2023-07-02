@@ -55,4 +55,24 @@ const createPost = async (req, res) => {
     }
 }
 
-module.exports = {createPost}
+const getPosts = async (req, res) => {
+    const posts = await Post.find()
+                    .populate('author', ['username'])
+                    .sort({createdAt: -1})
+                    .limit(20)
+
+    let postResponse = [];
+    for (let post of posts) {
+        postResponse.push({
+            title: post.title,
+            summary: post.summary,
+            author: post.author.username,
+            updatedAt: post.updatedAt,
+            cover: post.cover,
+        })
+    }
+
+    res.status(200).json(postResponse);
+}
+
+module.exports = {createPost, getPosts}
