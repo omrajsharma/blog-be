@@ -86,8 +86,8 @@ const profile = async (req, res) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({ _id: decoded.id });
-        const { username } = user;
-        res.status(200).json({ username });
+        const { _id, username } = user;
+        res.status(200).json({ _id, username });
     } catch (error) {
         res.status(401).end('Not authorized');
     }

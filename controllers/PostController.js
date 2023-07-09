@@ -86,4 +86,46 @@ const getPost = async (req, res) => {
     }
 }
 
-module.exports = {createPost, getPosts, getPost}
+const updatePost = async (req, res) => {
+    const token = req.cookies.token;
+    if (!token) {
+        res.status(401).json({ error : 'You must be login'})
+        return;
+    }
+
+    try {
+        const tokenInfo = jwt.verify(token, process.env.JWT_SECRET);
+        const {title, summary, content} = req.body;
+        const {postId} = req.params;
+
+        const postDoc = await Post.findById(postId);
+
+        const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(tokenInfo.id)
+        
+        if (!isAuthor) {
+            throw 'you are not the author of the POST'
+        }
+
+        let newPath = null;
+        if (req.file) {
+            const {originalname, path} = req.file;
+            const originalnameParts = originalname.split('.');
+            const fileExtension = originalnameParts[originalnameParts.length -1];
+            const newPath = path + '.' + fileExtension;
+            fs.renameSync(path, newPath);
+        }
+
+        await postDoc.updateOne({
+            title,
+            summary,
+            content,
+            cover: newPath ? newPath : postDoc.cover,
+        })
+
+        return res.status(200).json(postDoc)
+    } catch (err) {
+        return res.status(400).json({error : err})
+    }
+}
+
+module.exports = {createPost, getPosts, getPost, updatePost}

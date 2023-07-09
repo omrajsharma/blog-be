@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer')
 const uploadMiddleware = multer({ dest: 'uploads/' })
-const {createPost, getPosts, getPost} = require('../controllers/PostController')
+const {createPost, getPosts, getPost, updatePost} = require('../controllers/PostController')
 
 // /api/v1/post
 router.post('/', uploadMiddleware.single('file'), createPost)
@@ -12,5 +12,8 @@ router.get('/', getPosts)
 
 // /api/v1/post/:postId
 router.get('/:postId', getPost)
+
+// /api/v1/post/:postId
+router.put('/:postId', uploadMiddleware.single('file'), updatePost )
 
 module.exports = router;
