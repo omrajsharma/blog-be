@@ -64,6 +64,7 @@ const getPosts = async (req, res) => {
     let postResponse = [];
     for (let post of posts) {
         postResponse.push({
+            id: post._id,
             title: post.title,
             summary: post.summary,
             author: post.author.username,
@@ -75,4 +76,14 @@ const getPosts = async (req, res) => {
     res.status(200).json(postResponse);
 }
 
-module.exports = {createPost, getPosts}
+const getPost = async (req, res) => {
+    const {postId} = req.params;
+    try {
+        const postDoc = await Post.findById(postId).populate('author', ['username'])
+        res.json(postDoc);
+    } catch (err) {
+        res.status(400).end('error occured')
+    }
+}
+
+module.exports = {createPost, getPosts, getPost}
