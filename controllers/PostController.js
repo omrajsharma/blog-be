@@ -19,15 +19,15 @@ const createPost = async (req, res) => {
         res.status(400).end('Please add cover images')
         return
     }
-    if (title.length < 3 && title.length >= 100) {
+    if (title.length < 3 || title.length >= 100) {
         res.status(400).end('title should be greater than 3 characters and less than equals to 100 characters')
         return
     }
-    if (summary.length < 30 && summary.length >= 300) {
+    if (summary.length < 30 || summary.length >= 300) {
         res.status(400).end('summary should be greater than 30 characters and less than equals to 300 characters')
         return
     }
-    if (content.length < 30 && summary.length >= 50000) {
+    if (content.length < 30 || summary.length >= 50000) {
         res.status(400).end('content should be greater than 30 characters or your content is too large')
         return
     }
@@ -91,6 +91,27 @@ const updatePost = async (req, res) => {
     if (!token) {
         res.status(401).json({ error : 'You must be login'})
         return;
+    }
+
+    if (!title || !summary || !content) {
+        res.status(400).end('title, summary and content can not be empty');
+        return
+    }
+    if (req.file == undefined) {
+        res.status(400).end('Please add cover images')
+        return
+    }
+    if (title.length < 3 || title.length >= 100) {
+        res.status(400).end('title should be greater than 3 characters and less than equals to 100 characters')
+        return
+    }
+    if (summary.length < 30 || summary.length >= 300) {
+        res.status(400).end('summary should be greater than 30 characters and less than equals to 300 characters')
+        return
+    }
+    if (content.length < 30 || summary.length >= 50000) {
+        res.status(400).end('content should be greater than 30 characters or your content is too large')
+        return
     }
 
     try {
