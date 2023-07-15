@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const Post = require('../models/Post')
 
 const createPost = async (req, res) => {
-    const {title, summary, content} = req.body;
+    const {title, summary, content, thumbnail} = req.body;
     const token = req.cookies.token;
 
     if (!token) {
@@ -13,10 +13,6 @@ const createPost = async (req, res) => {
 
     if (!title || !summary || !content) {
         res.status(400).end('title, summary and content can not be empty');
-        return
-    }
-    if (req.file == undefined) {
-        res.status(400).end('Please add cover images')
         return
     }
     if (title.length < 3 || title.length >= 100) {
@@ -32,12 +28,6 @@ const createPost = async (req, res) => {
         return
     }
 
-    const {originalname, path} = req.file;
-    const originalnameParts = originalname.split('.');
-    const fileExtension = originalnameParts[originalnameParts.length -1];
-    const newPath = path + '.' + fileExtension;
-    fs.renameSync(path, newPath);
-
     try {
         const tokenInfo = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -45,7 +35,7 @@ const createPost = async (req, res) => {
             title,
             summary,
             content,
-            cover: newPath,
+            thumbnail,
             author: tokenInfo.id,
         })
 
@@ -69,7 +59,7 @@ const getPosts = async (req, res) => {
             summary: post.summary,
             author: post.author.username,
             updatedAt: post.updatedAt,
-            cover: post.cover,
+            thumbnail: post.thumbnail,
         })
     }
 
@@ -97,10 +87,6 @@ const updatePost = async (req, res) => {
         res.status(400).end('title, summary and content can not be empty');
         return
     }
-    if (req.file == undefined) {
-        res.status(400).end('Please add cover images')
-        return
-    }
     if (title.length < 3 || title.length >= 100) {
         res.status(400).end('title should be greater than 3 characters and less than equals to 100 characters')
         return
@@ -116,7 +102,7 @@ const updatePost = async (req, res) => {
 
     try {
         const tokenInfo = jwt.verify(token, process.env.JWT_SECRET);
-        const {title, summary, content} = req.body;
+        const {title, summary, content, thumbnail} = req.body;
         const {postId} = req.params;
 
         const postDoc = await Post.findById(postId);
@@ -127,20 +113,11 @@ const updatePost = async (req, res) => {
             throw 'you are not the author of the POST'
         }
 
-        let newPath = null;
-        if (req.file) {
-            const {originalname, path} = req.file;
-            const originalnameParts = originalname.split('.');
-            const fileExtension = originalnameParts[originalnameParts.length -1];
-            const newPath = path + '.' + fileExtension;
-            fs.renameSync(path, newPath);
-        }
-
         await postDoc.updateOne({
             title,
             summary,
             content,
-            cover: newPath ? newPath : postDoc.cover,
+            thumbnail,
         })
 
         return res.status(200).json(postDoc)

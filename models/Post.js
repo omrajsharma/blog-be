@@ -13,9 +13,9 @@ const PostSchema = new mongoose.Schema({
         type: String,
         require: [true, 'Content is required']
     },
-    cover: {
+    thumbnail: {
         type: String,
-        require: [true, 'Banner is required']
+        require: [true, 'Thumbnail is required']
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
